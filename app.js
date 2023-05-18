@@ -1,7 +1,11 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const sauceRoutes = require('./routes/sauce');
+
 const userRoutes = require('./routes/user');
-const helmet = require('helmet');
+const path = require('path');
+app.use('/images', express.static(path.join(__dirname, 'images')));
+// const helmet = require('helmet');
 require('dotenv').config();
 
 const app = express();
@@ -18,9 +22,9 @@ mongoose.connect(dbUri,
   .then(() => console.log('Connexion à MongoDB réussie !'))
   .catch(() => console.log('Connexion à MongoDB échouée !'));
 
-
 app.use(express.json());
-app.use(helmet());
+
+// Configuration de la politique de sécurité du contenu
 
 app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -29,17 +33,18 @@ app.use((req, res, next) => {
   next();
 });
 
+// app.use(
+//   helmet.contentSecurityPolicy({
+//     directives: {
+//       defaultSrc: ["'self'", 'data:', "'unsafe-inline'", "'unsafe-eval'", "*"],
+//       fontSrc: ["'self'", 'data:', 'https:', 'http:', "'unsafe-inline'", "'unsafe-eval'", "*"],
+//       styleSrc: ["'self'", "'unsafe-inline'", "*"],
+//       scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "*"],
+//     },
+//   })
+// );
 
-// Configuration de la politique de sécurité du contenu
-app.use(
-  helmet.contentSecurityPolicy({
-    directives: {
-      defaultSrc: ["'none'"],
-      fontSrc: ["'self'", 'data:'],
-    },
-  })
-);
-
+app.use('/api/sauce', sauceRoutes);
 app.use('/api/auth', userRoutes);
 
 module.exports = app;
