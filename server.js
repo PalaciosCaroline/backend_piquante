@@ -37,6 +37,13 @@ const errorHandler = error => {
 
 const server = http.createServer(app);
 
+process.on('SIGINT', () => {
+  server.close(() => {
+    console.log('Le serveur a été arrêté');
+    process.exit(0); // Terminer le processus Node.js
+  });
+});
+
 server.on('error', errorHandler);
 server.on('listening', () => {
   const address = server.address();
